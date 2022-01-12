@@ -2,28 +2,83 @@
 <html>
     <head>
         <title>About me</title>
-        <link href="./practice.css" rel="stylesheet" type="text/css">
+        <link href="./bootstrap4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 
         <script type="text/javascript" src="what_time_is_it.js"></script>
     </head>
     <body>
-        <nav>
-            <a href="./index.html">Home</a>
-            <a href="./blog_list.html">Blog</a>
-            <a href="/about_me.html">About Me</a>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container">
+                <a class="navbar-brand" href="./index.html">NA NA LAND</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./blog_list.html">Blog</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="./about_me.html">About me</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Dropdown link
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <a class="dropdown-item" href="#">Action</a>
+                                <a class="dropdown-item" href="#">Another action</a>
+                                <a class="dropdown-item" href="#">Something else here</a>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav ms-auto"> <!--로그인 버튼 맨 오른쪽 정렬-->
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Log In</a>
+                        </li>
+                    </ul>      
+                </div>
+            </div>
         </nav>
 
 
-        <h1>About Me</h1>
-        <h2>경희대학교 김나현입니다. </h2>
-        <p>HTML, CSS, JS, Django로 재미있는 웹 사이트를 만들고 싶습니다 :) </p>
+    <div class="container"> <!--container class 적용하여 여백 만들기-->
+        <div class="row my-3">   <!--이 안에 있는 내용을 첫 번째 행 하나로 보겠다. 행 바깥쪽으로 간격 두겠다(마진)-->
+            <div class="col-9"> <!--이 안은 9칸짜리 열(왼쪽 부분) 내용-->
+                <h1>About Me</h1>
+                <h2>경희대학교 김나현입니다. </h2>
+                <p>HTML, CSS, JS, Django로 재미있는 웹 사이트를 만들고 싶습니다 :) </p>
 
-        <button onclick="whatTimeIsIt()">현재시간</button>
-        <hr/>
+                <button onclick="whatTimeIsIt()">현재시간</button>
+                <hr/>
         
-        <a href="index.html">첫 화면으로 가기</a>
-        <img src="./images/girl_01.jpg" height="400px">
+                <a href="index.html">첫 화면으로 가기</a>
+            </div>
+            <div class="col-3"> <!--이 안은 3칸짜리 열(오른쪽 부분) 내용-->
+                <img src="./images/girl_01.jpg" class="img-fluid w-100">    <!--그림 높이가 고정되는 게 아니라, 3칸짜리 열에 해당하는 부분의 폭에 꽉 차게 설정됨-->
+            </div>
+        </div>
+        <div class="row">   <!--두 번째 행 시작-->
+            <div class="col-12">
+                <h2>Portfolio</h2>
+            </div>
+            <div class="col-sm col-lg-6 text-light bg-info">
+                <img src="./images/image_a.jpg" class="img-fluid">
+            </div>
+            <div class="col-sm col-lg-3 text-light bg-primary">
+                <img src="./images/image_b.jpg" class="img-fluid">
+            </div>
+            <div class="col-sm col-lg-3 text-light bg-secondary">
+                <img src="./images/image_c.jpg" class="img-fluid">
+            </div>
+        </div>
+    </div>
 
 
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     </body>
 </html>
