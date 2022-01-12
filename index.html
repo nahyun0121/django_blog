@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>  <!--문서에 대한 기본적인 정보가 담겨 있음-->
+        <title>김나현의 홈페이지</title>
+        <link href="./practice.css" rel="stylesheet" type="text/css">
+
+        <script type="text/javascript" src="add_two_numbers.js"></script>
+        <script type="text/javascript" src="what_time_is_it.js"></script>
+    </head>
+    <body>  <!--주로 화면에 나타나는 내용이 담겨 있음-->
+        <nav>   <!--웹 사이트의 주요 페이지를 안내하는 내비게이션 역할을 만들 때 사용-->
+            <a href="./index.html">Home</a>     <!--a: 해당 부분을 클릭하면 페이지가 이동하도록 함 / href: 넘어갈 링크 지정-->
+            <a href="./blog_list.html">Blog</a>
+            <a href="./about_me.html">About Me</a>
+        </nav>
+
+
+        <h1>첫 번째 크기 헤드라인</h1>
+        <h2>두 번째 크기 헤드라인</h2>
+        <h3>세 번째 크기 헤드라인</h3>
+        <h4>네 번째 크기 헤드라인</h4>
+        <h5>다섯 번째 크기 헤드라인</h5>
+
+        <button onclick="whatTimeIsIt()">현재시간</button>
+        <hr/>
+
+
+        <label for="inputA">a</label>
+        <input id="inputA" value=1 onkeyup="doSomething()">
+        <label for="inputB">b</label>
+        <input id="inputB" value=2 onkeyup="doSomething()">
+
+        
+        <p><span id="valueA">1</span> + <span id="valueB">2</span> = <span id="valueC">3</span>입니다.</p>
+
+        <p>문단은 p로 쓰세요. p는 아마도 Paragraph의 앞글자를 따온 것이겠죠?</p>
+        <a href="https://www.naver.com">Go to naver</a>
+        <hr/>   <!--수평선을 그어주는 태그-->
+        <img src="./images/pochacco.jpg" width="600px">
+    </body>
+</html>
