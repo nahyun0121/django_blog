@@ -1,2 +1,2 @@
-# django_blog
-Django로 웹 블로그 만들기!
+# django_blog_practice
+HTML, CSS, JS 사용해보기!
