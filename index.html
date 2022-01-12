@@ -2,17 +2,43 @@
 <html>
     <head>  <!--문서에 대한 기본적인 정보가 담겨 있음-->
         <title>김나현의 홈페이지</title>
-        <link href="./practice.css" rel="stylesheet" type="text/css">
+        <link href="./bootstrap4/css/bootstrap.min.css" rel="stylesheet" type="text/css">
 
         <script type="text/javascript" src="add_two_numbers.js"></script>
         <script type="text/javascript" src="what_time_is_it.js"></script>
     </head>
     <body>  <!--주로 화면에 나타나는 내용이 담겨 있음-->
-        <nav>   <!--웹 사이트의 주요 페이지를 안내하는 내비게이션 역할을 만들 때 사용-->
-            <a href="./index.html">Home</a>     <!--a: 해당 부분을 클릭하면 페이지가 이동하도록 함 / href: 넘어갈 링크 지정-->
-            <a href="./blog_list.html">Blog</a>
-            <a href="./about_me.html">About Me</a>
-        </nav>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="./index.html">NA NA LAND</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="./index.html">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="./blog_list.html">Blog</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="./about_me.html">About Me</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Dropdown link
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                      <li><a class="dropdown-item" href="#">Action</a></li>
+                      <li><a class="dropdown-item" href="#">Another action</a></li>
+                      <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
 
 
         <h1>첫 번째 크기 헤드라인</h1>
@@ -37,5 +63,9 @@
         <a href="https://www.naver.com">Go to naver</a>
         <hr/>   <!--수평선을 그어주는 태그-->
         <img src="./images/pochacco.jpg" width="600px">
+
+
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     </body>
 </html>
