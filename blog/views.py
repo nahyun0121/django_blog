@@ -12,3 +12,14 @@ def index(request):
             'posts': posts,
         }
     )
+
+def single_post_page(request, pk):
+    post = Post.objects.get(pk=pk)      # Post.objects.get(): 괄호 안의 조건을 만족하는 Post 레코드를 가져오라
+
+    return render(
+        request,
+        'blog/single_post_page.html',
+        {
+            'post': post,
+        }
+    )
