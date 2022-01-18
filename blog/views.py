@@ -3,11 +3,11 @@ from django.views.generic import ListView, DetailView
 from .models import Post
 
 # CBV방식으로 구현
-class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦
+class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦. 'post_list.html'을 기본 템플릿으로 사용
     model = Post
     ordering = '-pk'
 
-class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수를 대체하는 PostDetail 클래스
+class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수를 대체하는 PostDetail 클래스. 'post_detail.html'을 기본 템플릿으로 사용
     model = Post
 
 
