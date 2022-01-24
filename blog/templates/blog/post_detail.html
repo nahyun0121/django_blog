@@ -11,6 +11,7 @@
         <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
         <!-- Custom styles for this template -->
         <link rel="stylesheet" href="{% static 'blog/css/blog-post.css' %}" media="screen">
+        <script src="https://kit.fontawesome.com/c609b81c0f.js" crossorigin="anonymous"></script>
     </head>
     <body>
         <!-- Responsive navbar-->
@@ -46,13 +47,32 @@
                         </header>
                         <!-- Preview image figure-->
                         {% if post.head_image %}
-                            <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="{{ post.title }} head_image" /></figure>
+                            <figure class="mb-4"><img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="{{ post.title }} head_image"></figure>
                         {% else %}
                             <figure class="mb-4"><img class="img-fluid rounded" src="https://picsum.photos/seed/{{ post.id }}/800/200" alt="random image"></figure>
                         {% endif %}
-                        <hr>
+
                         <!-- Post content-->
                         <p>{{ post.content }}</p>
+
+                        {% if post.file_upload %}
+                            <a href="{{ post.file_upload.url }}"><button type="button" class="btn btn-outline-secondary">
+                                Download:
+
+                            {% if post.get_file_ext == 'docx' or post.get_file_ext == 'doc' %}
+                                <i class="far fa-file-word"></i>
+                            {% elif post.get_file_ext == 'xlsx' or post.get_file_ext == 'xls' %}
+                                <i class="far fa-file-excel"></i>
+                            {% elif post.get_file_ext == 'pdf' %}
+                                <i class="far fa-file-pdf"></i>
+                            {% else %}
+                                <i class="far fa-file"></i>
+                            {% endif %}
+                                {{ post.get_file_name }}
+                            </button></a>
+                        {% endif %}
+
+                        <hr>
 
                     </article>
                     <!-- Comments section-->
