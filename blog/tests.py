@@ -1,3 +1,4 @@
+from telnetlib import LOGOUT
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from .models import Post
@@ -10,6 +11,25 @@ class TestView(TestCase):
     def setUp(self):
         self.client = Client()
 
+    def navbar_test(self, soup):                                       # 내비게이션 바를 점검하는 함수
+        # 내비게이션 바가 있다.
+        navbar = soup.nav                                              # soup에 담긴 내용 중 nav 요소만 가져와 navbar에 저장.
+        # Blog, About me라는 문구가 내비게이션 바에 있다.
+        self.assertIn('Blog', navbar.text)
+        self.assertIn('About me', navbar.text)                         # navbar의 텍스트 중 Blog와 About Me가 있는지 확인함.
+
+        logo_btn = navbar.find('a', text='NA NA LAND')                 # 'NA NA LAND' 버튼 점검 코드. 'NA NA LAND'라는 문구를 가진 a 요소를 찾아 logo_btn 변수에 담는다.
+        self.assertEqual(logo_btn.attrs['href'], '/')                  # a 요소에서 href 속성을 찾아 값이 '/'인지 확인.
+
+        home_btn = navbar.find('a', text='Home')
+        self.assertEqual(home_btn.attrs['href'], '/')
+
+        blog_btn = navbar.find('a', text='Blog')
+        self.assertEqual(blog_btn.attrs['href'], '/blog/')
+
+        about_me_btn = navbar.find('a', text='About me')
+        self.assertEqual(about_me_btn.attrs['href'], '/about_me/')
+
     def test_post_list(self):
         # 1.1 포스트 목록 페이지를 가져온다.
         response = self.client.get('/blog/')                           # 테스트를 위한 가상의 사용자(client)가 웹 브라우저에 '~~/blog/'를 입력할 때 열리는 웹 페이지의 정보를 response에 저장함.
@@ -18,11 +38,8 @@ class TestView(TestCase):
         # 1.3 페이지 타이틀은 'Blog'이다.
         soup = BeautifulSoup(response.content, 'html.parser')          # 불러온 페이지의 내용(HTML로 구성됨)에 쉽게 접근하기 위해 BeautifulSoup으로 읽어들인 후, 파싱한 결과를 soup에 담음.
         self.assertEqual(soup.title.text, 'Blog')                      # title 요소에서 텍스트만 가져와 Blog인지 확인.
-        # 1.4 내비게이션 바가 있다.
-        navbar = soup.nav                                              # soup에 담긴 내용 중 nav 요소만 가져와 navbar에 저장.
-        # 1.5 Blog, About Me라는 문구가 내비게이션 바에 있다.
-        self.assertIn('Blog', navbar.text)
-        self.assertIn('About me', navbar.text)                         # navbar의 텍스트 중 Blog와 About Me가 있는지 확인함.
+        # 1.4 내비게이션 바가 있으며 Blog, About me라는 문구가 내비게이션 바에 있다.
+        self.navbar_test(soup)                    
 
         # 2.1 메인 영역에 게시물이 하나도 없다면
         self.assertEqual(Post.objects.count(), 0)                      # 작성된 포스트가 0개인지 확인함. 테스트가 시작되면 테스트를 위한 새 데이터베이스를 임시로 만드는데, setUp()에서 설정한 요소는 포함시킨다.(테스트를 위한 새 데이터베이스에 어떤 정보도 담아놓으라는 말이 없음) -> 테스트 데이터베이스에는 현재 포스트가 하나도 없어야 함!
@@ -68,9 +85,7 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
         # 2.2 포스트 목록 페이지와 똑같은 내비게이션 바가 있다.
-        navbar = soup.nav
-        self.assertIn('Blog', navbar.text)
-        self.assertIn('About me', navbar.text)
+        self.navbar_test(soup)
         # 2.3. 첫 번째 포스트의 제목이 웹 브라우저 탭 타이틀에 들어 있다.
         self.assertIn(post_001.title, soup.title.text)
         # 2.4. 첫 번째 포스트의 제목이 포스트 영역에 있다.
