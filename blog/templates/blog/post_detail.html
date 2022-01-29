@@ -13,7 +13,7 @@
                 <!-- Post title-->
                 <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
                 <!-- Post meta content-->
-                <div class="text-muted fst-italic text-end">{{ post.created_at }} by 작성자명 쓸 위치^^(개발예정)</div>
+                <div class="text-muted fst-italic text-end">{{ post.created_at }} by {{ post.author | upper }}</div>
                 <!--    &lt;!&ndash; Post categories&ndash;&gt;-->
                 <!--    <a class="badge bg-secondary text-decoration-none link-light" href="#!">Web Design</a>-->
                 <!--    <a class="badge bg-secondary text-decoration-none link-light" href="#!">Freebies</a>-->

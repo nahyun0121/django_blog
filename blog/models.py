@@ -2,6 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)                               # unique=True: 고유하다는 뜻. 동일한 name을 갖는 카테고리를 또 만들수 없음.
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)          # SlugField: 사람이 읽을 수 있는 텍스트로 고유 URL을 만들고 싶을 때 주로 사용.(한글 지원 X. 그래서 allow_unicode=True 씀)
+
+
+    def __str__(self):
+        return self.name
+
+    class Meta:                                                                       # Category 모델의 메타 설정에서 verbose_name_plural로 복수형을 직접 지정함.
+        verbose_name_plural = 'Categories'
+
 
 class Post(models.Model):
     title = models.CharField(max_length=30)
@@ -16,6 +27,9 @@ class Post(models.Model):
     
     #author = models.ForeignKey(User, on_delete=models.CASCADE)                        # ForeignKey로 autor 필드 구현. 한 포스트의 작성자가 데이터베이스에서 삭제되었을 때 그 포스트도 같이 삭제된다.
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)                        # 한 포스트의 작성자가 데이터베이스에서 삭제되었을 때 작성자명을 빈 칸으로 두겠다.(작성한 글은 남김)
+
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+
 
     def __str__(self):
         return f'[{self.pk}]{self.title} :: {self.author}'                            # pk: 각 레코드에 대한 고유값. 첫 번째 포스트는 pk값이 1, 두 번째 포스트는 pk값이 2..

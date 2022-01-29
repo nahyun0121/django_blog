@@ -1,11 +1,17 @@
 # from django.shortcuts import render
 from django.views.generic import ListView, DetailView 
-from .models import Post
+from .models import Post, Category
 
 # CBV방식으로 구현
 class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦. 'base.html'을 기본 템플릿으로 사용
     model = Post
     ordering = '-pk'
+
+    def get_context_data(self, **kwargs):                                                   # get_context_data 정의하여 오버라이딩
+        context = super(PostList, self).get_context_data()
+        context['categories'] = Category.objects.all()
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        return context
 
 class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수를 대체하는 PostDetail 클래스. 'post_detail.html'을 기본 템플릿으로 사용
     model = Post
