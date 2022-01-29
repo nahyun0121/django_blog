@@ -16,6 +16,12 @@ class PostList(ListView):           # FBV 스타일의 index() 함수를 대체�
 class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수를 대체하는 PostDetail 클래스. 'post_detail.html'을 기본 템플릿으로 사용
     model = Post
 
+    def get_context_data(self, **kwargs):                                                   # get_context_data 정의하여 오버라이딩
+        context = super(PostDetail, self).get_context_data()
+        context['categories'] = Category.objects.all()
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        return context
+
 
 # FBV방식으로 구현
 # def index(request):

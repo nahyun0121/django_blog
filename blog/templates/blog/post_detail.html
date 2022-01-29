@@ -8,10 +8,16 @@
     <div id="post-area">
         <!-- Post content-->
         <article>
+        <!-- Post category-->
+            {% if post.category %}
+                <span class="badge rounded-pill bg-secondary float-end">{{ post.category }}</span>
+            {% else %}
+                <span class="badge rounded-pill bg-secondary float-end">미분류</span>
+            {% endif %}
         <!-- Post header-->
             <header class="mb-4">
                 <!-- Post title-->
-                <h1 class="fw-bolder mb-1">{{ post.title }}</h1>
+                <h1 class="mt-4">{{ post.title }}</h1>
                 <!-- Post meta content-->
                 <div class="text-muted fst-italic text-end">{{ post.created_at }} by {{ post.author | upper }}</div>
                 <!--    &lt;!&ndash; Post categories&ndash;&gt;-->
