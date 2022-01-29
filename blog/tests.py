@@ -114,7 +114,7 @@ class TestView(TestCase):
         response = self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
-        # 2.2 포스트 목록 페이지와 똑같은 내비게이션 바와 카테고리 칸이 있다.
+        # 2.2 포스트 목록 페이지와 똑같은 내비게이션 바와 카테고리 카드가 있다.
         self.navbar_test(soup)
         self.category_card_test(soup)
         # 2.3. 첫 번째 포스트의 제목이 웹 브라우저 탭 타이틀에 들어 있다.
@@ -128,3 +128,24 @@ class TestView(TestCase):
         self.assertIn(self.user_kancho.username.upper(), post_area.text)
         # 2.6. 첫 번째 포스트의 내용(content)이 포스트 영역에 있다.
         self.assertIn(self.post_001.content, post_area.text)
+
+
+    def test_category_page(self):
+        # 카테고리 programming 페이지의 고유 URL로 접근하면 정상적으로 작동한다.
+        response = self.client.get(self.category_programming.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+
+        # beautifulsoup4로 HTML를 다루기 쉽게 파싱한 후, 내비게이션 바와 카테고리 카드가 잘 구성되어 있는지 확인한다.
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.navbar_test(soup)
+        self.category_card_test(soup)
+
+        # 페이지 상단에 카테고리 뱃지가 잘 나타나는지 확인한다.(이 페이지에서는 <h2> 태그를 한 번만 쓰므로 <h2>에 카테고리 이름이 있는지 확인)
+        self.assertIn(self.category_programming.name, soup.h2.text)
+
+        # 메인 영역에서 카테고리 programming이 있는지 확인하고, 이 카테고리에 해당하는 포스트만 노출되어 있는지 확인한다.
+        main_area = soup.find('div', id='main-area')
+        self.assertIn(self.category_programming.name, main_area.text)
+        self.assertIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)

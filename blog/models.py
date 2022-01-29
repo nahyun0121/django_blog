@@ -10,6 +10,9 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return f'/blog/category/{self.slug}/'
+
     class Meta:                                                                       # Category 모델의 메타 설정에서 verbose_name_plural로 복수형을 직접 지정함.
         verbose_name_plural = 'Categories'
 

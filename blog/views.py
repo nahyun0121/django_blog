@@ -1,4 +1,4 @@
-# from django.shortcuts import render
+from django.shortcuts import render
 from django.views.generic import ListView, DetailView 
 from .models import Post, Category
 
@@ -22,6 +22,25 @@ class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수�
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
         return context
 
+# FBV방식으로 category_page() 구현
+def category_page(request, slug):
+    if slug == 'no_category':
+        category = '미분류'
+        post_list = Post.objects.filter(category=None)      # 포스트 중에서 카테고리가 없는 것만 가져온다.
+    else:
+        category = Category.objects.get(slug=slug)      # url에서 추출하여 category_page()의 인자로 받은 slug와 동일한 slug를 갖는 카테고리를 불러오는 쿼리셋을 만들어 category 변수에 저장한다.
+        post_list = Post.objects.filter(category=category)      # 포스트 중에서 category와 동일한 카테고리만 가져온다.
+
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list': post_list,                                                 # 포스트 중에서 바로 위에서 필터링한 카테고리만 가져온다.
+            'categories': Category.objects.all(),                                   # 카테고리 카드를 채운다.
+            'no_category_post_count': Post.objects.filter(category=None).count(),   # 미분류 포스트와 그 개수를 알려준다.
+            'category': category,                                                   # 페이지 타이틀 옆에 카테고리 이름을 알려준다.
+        }
+    )
 
 # FBV방식으로 구현
 # def index(request):
