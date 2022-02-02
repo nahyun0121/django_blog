@@ -1,8 +1,12 @@
 {% extends 'blog/base.html' %}
 
 {% block main_area %}
-    <h1 style="display:inline">Blog</h1>            <!--style="display:inline"으로 줄바꿈 방지-->
-    {% if category %}<h2 style="display:inline" class="lh-lg"><span class="badge rounded-pill bg-secondary">{{ category }}</span></h2>{% endif %}
+    {% if category %}
+        <h1 style="display:inline">Blog</h1></h1>       <!--style="display:inline"으로 줄바꿈 방지-->
+        <h2 style="display:inline" class="lh-lg"><span class="badge rounded-pill bg-secondary">{{ category }}</span></h2>
+    {% else %}
+        <h1>Blog</h1>
+    {% endif %}
     {% if post_list.exists %}   <!--post_list에 포스트가 있다면 실행-->
         {% for p in post_list %}
             <!-- Blog post-->
@@ -24,6 +28,15 @@
                         <h5 class="text-muted">{{ p.hook_text }}</h5>
                     {% endif %}
                     <p class="card-text">{{ p.content | truncatewords:45 }}</p>
+
+                    {% if p.tags.exists %}
+                        <i class="fas fa-hashtag"></i>
+                        {% for tag in p.tags.all %}
+                            <a href="{{ tag.get_absolute_url }}"><span class="badge bg-light text-dark">{{ tag }}</span></a>
+                        {% endfor %}
+                        <br/>
+                        <br/>
+                    {% endif %}
                     <a class="btn btn-outline-secondary" href="{{ p.get_absolute_url }}">Read more →</a>
                 </div>
                 <div class="card-footer text-muted">

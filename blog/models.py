@@ -17,6 +17,18 @@ class Category(models.Model):
         verbose_name_plural = 'Categories'
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)                               # unique=True: 고유하다는 뜻. 동일한 name을 갖는 카테고리를 또 만들수 없음.
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)          # SlugField: 사람이 읽을 수 있는 텍스트로 고유 URL을 만들고 싶을 때 주로 사용.(한글 지원 X. 그래서 allow_unicode=True 씀)
+
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return f'/blog/tag/{self.slug}/'
+
+
 class Post(models.Model):
     title = models.CharField(max_length=30)
     hook_text = models.CharField(max_length=100, blank=True)
@@ -28,10 +40,12 @@ class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)                              # 처음 레코드가 생성될 때 현재 시각이 자동으로 저장됨
     updated_at = models.DateTimeField(auto_now=True)                                  # 다시 저장할 때마다 그 시각이 저장됨
     
-    #author = models.ForeignKey(User, on_delete=models.CASCADE)                        # ForeignKey로 autor 필드 구현. 한 포스트의 작성자가 데이터베이스에서 삭제되었을 때 그 포스트도 같이 삭제된다.
+    #author = models.ForeignKey(User, on_delete=models.CASCADE)                        # ForeignKey로 author 필드 구현. 한 포스트의 작성자가 데이터베이스에서 삭제되었을 때 그 포스트도 같이 삭제된다.
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)                        # 한 포스트의 작성자가 데이터베이스에서 삭제되었을 때 작성자명을 빈 칸으로 두겠다.(작성한 글은 남김)
 
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+
+    tags = models.ManyToManyField(Tag, blank=True)                                    # ManyToManyField는 기본적으로 null=True가 설정돼 있다.
 
 
     def __str__(self):

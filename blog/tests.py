@@ -2,7 +2,7 @@ from telnetlib import LOGOUT
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 # class TestView(TestCase):
 #     def test_post_list(self):   # 'Test'로 시작하는 이름을 가진 클래스 안에 'test'로 시작하는 이름으로 함수를 정의함. => 테스트 코드를 작성할 때의 규칙!
@@ -15,14 +15,20 @@ class TestView(TestCase):
         self.user_jamna = User.objects.create_user(username='jamna', password='somepassword')
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_daily = Category.objects.create(name='daily', slug='daily')
+        self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
+        self.tag_python = Tag.objects.create(name='python', slug='python')
+        self.tag_hello = Tag.objects.create(name='hello', slug='hello')
+
 
         # 3.1 게시물이 3개 있다면
-        self.post_001 = Post.objects.create(                                # Post 레코드가 데이터베이스에 존재하는 상황도 테스트하기 위해 새로운 포스트를 만든다.
+        self.post_001 = Post.objects.create(                           # Post 레코드가 데이터베이스에 존재하는 상황도 테스트하기 위해 새로운 포스트를 만든다.
             title = '첫 번째 포스트입니다.',                            # 매개변수에는 Post 모델의 필드 값을 넣음.
             content = "기다렸어 어서와. 어디든 We're coming together.",
             category = self.category_programming,
             author = self.user_kancho
         )
+        self.post_001.tags.add(self.tag_hello)                         # 이미 만들어진 첫 번째 포스트에 태그를 추가함.(ManyToManyField는 여러 개의 레코드를 연결할 수 있기 때문.)
+
         self.post_002 = Post.objects.create(
             title = '두 번째 포스트입니다.',
             content = '아무 걱정 하지 마, 잘 될 거야 Hello future.',
@@ -35,6 +41,8 @@ class TestView(TestCase):
             content = '너를 만나 같이 더 빛나.',
             author = self.user_kancho
         )
+        self.post_003.tags.add(self.tag_python_kor)
+        self.post_003.tags.add(self.tag_python)
 
     def category_card_test(self, soup):
             categories_card = soup.find('div', id='categories-card')
@@ -76,18 +84,27 @@ class TestView(TestCase):
         main_area = soup.find('div', id = 'main-area')                      # id가 main-area인 div 요소를 찾아 main_area에 저장.
         self.assertNotIn('아직 게시물이 없습니다', main_area.text)           # 데이터베이스에 저장된 Post 레코드가 3개 있으므로 메인 영역에 '아직 게시물이 없습니다'가 안 나타나는지 점검.
 
-        # id가 post-1인 div 요소룰 main_area에서 찾아 post_001_card에 담은 후, 그 안에 첫 번째 게시물의 제목과 카테고리 이름이 있는지 확인.
+        # id가 post-1인 div 요소룰 main_area에서 찾아 post_001_card에 담은 후, 그 안에 첫 번째 게시물의 제목, 카테고리 이름, 알맞은 태그 이름이 잘 있는지 확인.
         post_001_card = main_area.find('div', id = 'post-1')
         self.assertIn(self.post_001.title, post_001_card.text)
         self.assertIn(self.post_001.category.name, post_001_card.text)
+        self.assertIn(self.tag_hello.name, post_001_card.text)
+        self.assertNotIn(self.tag_python.name, post_001_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_001_card.text)
 
         post_002_card = main_area.find('div', id = 'post-2')
         self.assertIn(self.post_002.title, post_002_card.text)
         self.assertIn(self.post_002.category.name, post_002_card.text)
+        self.assertNotIn(self.tag_hello.name, post_002_card.text)
+        self.assertNotIn(self.tag_python.name, post_002_card.text)
+        self.assertNotIn(self.tag_python_kor.name, post_002_card.text)
 
         post_003_card = main_area.find('div', id = 'post-3')
         self.assertIn('미분류', post_003_card.text)
         self.assertIn(self.post_003.title, post_003_card.text)
+        self.assertNotIn(self.tag_hello.name, post_003_card.text)
+        self.assertIn(self.tag_python.name, post_003_card.text)
+        self.assertIn(self.tag_python_kor.name, post_003_card.text)
 
         # 메인 영역에서 작성자명으로 kancho와 jamna가 나온다. 작성자명은 대문자로 표기된다.
         self.assertIn(self.user_jamna.username.upper(), main_area.text)
@@ -128,7 +145,10 @@ class TestView(TestCase):
         self.assertIn(self.user_kancho.username.upper(), post_area.text)
         # 2.6. 첫 번째 포스트의 내용(content)이 포스트 영역에 있다.
         self.assertIn(self.post_001.content, post_area.text)
-
+        # 2.7. 첫 번째 포스트의 태그(tag)가 포스트 영역에 있다.
+        self.assertIn(self.tag_hello.name, post_area.text)
+        self.assertNotIn(self.tag_python.name, post_area.text)
+        self.assertNotIn(self.tag_python_kor.name, post_area.text)
 
     def test_category_page(self):
         # 카테고리 programming 페이지의 고유 URL로 접근하면 정상적으로 작동한다.
