@@ -44,12 +44,14 @@ class TestView(TestCase):
         self.post_003.tags.add(self.tag_python_kor)
         self.post_003.tags.add(self.tag_python)
 
+
     def category_card_test(self, soup):
             categories_card = soup.find('div', id='categories-card')
             self.assertIn('Categories', categories_card.text)
             self.assertIn(f'{self.category_programming.name} ({self.category_programming.post_set.count()})', categories_card.text)
             self.assertIn(f'{self.category_daily.name} ({self.category_daily.post_set.count()})', categories_card.text)
             self.assertIn(f'미분류 (1)', categories_card.text)
+
 
     def navbar_test(self, soup):                                       # 내비게이션 바를 점검하는 함수
         # 내비게이션 바가 있다.
@@ -69,6 +71,7 @@ class TestView(TestCase):
 
         about_me_btn = navbar.find('a', text='About me')
         self.assertEqual(about_me_btn.attrs['href'], '/about_me/')
+
 
     def test_post_list(self):
         # 포스트가 있는 경우
@@ -120,7 +123,6 @@ class TestView(TestCase):
         self.assertIn('아직 게시물이 없습니다', main_area.text)
 
 
-    
     def test_post_detail(self):
         
         # 1.2 미리 만들어둔 첫 번째 포스트의 url은 '/blog/1/'이다.
@@ -150,6 +152,7 @@ class TestView(TestCase):
         self.assertNotIn(self.tag_python.name, post_area.text)
         self.assertNotIn(self.tag_python_kor.name, post_area.text)
 
+
     def test_category_page(self):
         # 카테고리 programming 페이지의 고유 URL로 접근하면 정상적으로 작동한다.
         response = self.client.get(self.category_programming.get_absolute_url())
@@ -166,6 +169,25 @@ class TestView(TestCase):
         # 메인 영역에서 카테고리 programming이 있는지 확인하고, 이 카테고리에 해당하는 포스트만 노출되어 있는지 확인한다.
         main_area = soup.find('div', id='main-area')
         self.assertIn(self.category_programming.name, main_area.text)
+        self.assertIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertNotIn(self.post_003.title, main_area.text)
+
+
+    def test_tag_page(self):
+        # setUp() 함수에서 만든 태그 중 name 필드가 'hello'인 페이지의 고유 URL로 접근하면 정상 작동 확인 및 HTML 파싱하기
+        response = self.client.get(self.tag_hello.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.navbar_test(soup)
+        self.category_card_test(soup)
+
+        self.assertIn(self.tag_hello.name, soup.h1.text)
+
+        main_area = soup.find('div', id='main-area')
+        self.assertIn(self.tag_hello.name, main_area.text)
+        
         self.assertIn(self.post_001.title, main_area.text)
         self.assertNotIn(self.post_002.title, main_area.text)
         self.assertNotIn(self.post_003.title, main_area.text)

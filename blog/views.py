@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView 
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 # CBV방식으로 구현
 class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦. 'base.html'을 기본 템플릿으로 사용
@@ -39,6 +39,22 @@ def category_page(request, slug):
             'categories': Category.objects.all(),                                   # 카테고리 카드를 채운다.
             'no_category_post_count': Post.objects.filter(category=None).count(),   # 미분류 포스트와 그 개수를 알려준다.
             'category': category,                                                   # 페이지 타이틀 옆에 카테고리 이름을 알려준다.
+        }
+    )
+
+# FBV방식으로 tag_page() 구현
+def tag_page(request, slug):
+    tag = Tag.objects.get(slug=slug)                   # url에서 추출하여 tag_page()의 인자로 받은 slug와 동일한 slug를 갖는 태그를 불러오는 쿼리셋을 만들어 tag 변수에 저장한다.
+    post_list = tag.post_set.all()                     # 그 태그에 연결된 포스트 전체를 post_list 변수에 저장한다.
+
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list': post_list,
+            'tag': tag,
+            'categories': Category.objects.all(),
+            'no_category_post_count': Post.objects.filter(category=None).count(),
         }
     )
 

@@ -2,10 +2,18 @@
 
 {% block main_area %}
     {% if category %}
-        <h1 style="display:inline">Blog</h1></h1>       <!--style="display:inline"으로 줄바꿈 방지-->
+        <h1 style="display:inline">Blog</h1>       <!--style="display:inline"으로 줄바꿈 방지-->
         <h2 style="display:inline" class="lh-lg"><span class="badge rounded-pill bg-secondary">{{ category }}</span></h2>
     {% else %}
-        <h1>Blog</h1>
+        <h1>Blog
+        {% if tag %}
+            <button type="button" class="btn btn-light position-relative"><i class="fas fa-hashtag"></i> {{ tag }}
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{tag.post_set.count }}
+                    <span class="visually-hidden">number of tags</span>
+                </span>
+            </button>
+            {% endif %}
+        </h1>
     {% endif %}
     {% if post_list.exists %}   <!--post_list에 포스트가 있다면 실행-->
         {% for p in post_list %}
