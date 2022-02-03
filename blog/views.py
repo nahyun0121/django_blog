@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
 
 # CBV방식으로 구현
@@ -23,13 +23,16 @@ class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수�
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
         return context
 
-class PostCreate(LoginRequiredMixin, CreateView):                                           # LoginRequiredMixin 클래스는 장고에서 제공하며, 로그인했을 때만 정상적으로 페이지를 보여줌.
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):                      # LoginRequiredMixin 클래스는 장고에서 제공하며, 로그인했을 때만 정상적으로 페이지를 보여줌.
     model = Post                                                                            # Post 모델을 사용한다고 model 변수에 선언함
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']     # Post 모델에 사용할 필드명을 리스트로 fields에 저장
     
+    def test_func(self):                                                                    # 이 페이지에 접근 가능한 사용자는 최고 관리자 또는 스태프로 제한하는 함수
+        return self.request.user.is_superuser or self.request.user.is_staff
+
     def form_valid(self, form):                                                             # CreateView에서 제공하는 form_valid()를 재정의하여 확장함.
         current_user = self.request.user
-        if current_user.is_authenticated:
+        if current_user.is_authenticated and (current_user.is_staff or current_user.is_supersuer):
             form.instance.author = current_user
             return super(PostCreate, self).form_valid(form)
         else:

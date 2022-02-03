@@ -13,6 +13,8 @@ class TestView(TestCase):
         self.client = Client()
         self.user_kancho = User.objects.create_user(username='kancho', password='somepassword')         # 사용자 생성(이름, 패스워드까지 설정)
         self.user_jamna = User.objects.create_user(username='jamna', password='somepassword')
+        self.user_kancho.is_staff = True                                                                # 사용자 '칸쵸'는 스태프!
+        self.user_kancho.save()
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_daily = Category.objects.create(name='daily', slug='daily')
         self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
@@ -198,7 +200,12 @@ class TestView(TestCase):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
-        # 로그인을 한다.
+        # staff가 아닌 jamna가 로그인을 하여 포스트 생성을 하지 못 한다.
+        self.client.login(username='jamna', password='somepassword')
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
+
+        # staff인 kancho로 로그인을 한다.
         self.client.login(username='kancho', password='somepassword')
 
         # /blog/create_post/라는 URL로 방문자가 접근하면 포스트 작성 페이지가 정상적으로 열리는지 확인 후 HTML 파싱한다.

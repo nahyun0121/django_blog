@@ -1,6 +1,12 @@
 {% extends 'blog/base.html' %}
 
 {% block main_area %}
+
+    {% if user.is_authenticated %}
+        {% if user.is_superuser or user.is_staff %}
+            <a class="btn btn-outline-secondary btn-sm float-end" href="/blog/create_post/" role="button"><i class="fas fa-pencil-alt"></i>&nbsp;&nbsp;New Post</a>
+        {% endif %}
+    {% endif %}
     {% if category %}
         <h1 style="display:inline">Blog</h1>       <!--style="display:inline"으로 줄바꿈 방지-->
         <h2 style="display:inline" class="lh-lg"><span class="badge rounded-pill bg-secondary">{{ category }}</span></h2>
