@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView 
+from django.shortcuts import render, redirect
+from django.views.generic import ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Post, Category, Tag
 
 # CBV방식으로 구현
@@ -21,6 +22,18 @@ class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수�
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
         return context
+
+class PostCreate(LoginRequiredMixin, CreateView):                                           # LoginRequiredMixin 클래스는 장고에서 제공하며, 로그인했을 때만 정상적으로 페이지를 보여줌.
+    model = Post                                                                            # Post 모델을 사용한다고 model 변수에 선언함
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']     # Post 모델에 사용할 필드명을 리스트로 fields에 저장
+    
+    def form_valid(self, form):                                                             # CreateView에서 제공하는 form_valid()를 재정의하여 확장함.
+        current_user = self.request.user
+        if current_user.is_authenticated:
+            form.instance.author = current_user
+            return super(PostCreate, self).form_valid(form)
+        else:
+            return redirect('/blog/')
 
 # FBV방식으로 category_page() 구현
 def category_page(request, slug):
@@ -57,6 +70,7 @@ def tag_page(request, slug):
             'no_category_post_count': Post.objects.filter(category=None).count(),
         }
     )
+
 
 # FBV방식으로 구현
 # def index(request):
