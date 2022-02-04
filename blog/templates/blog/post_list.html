@@ -4,7 +4,7 @@
 
     {% if user.is_authenticated %}
         {% if user.is_superuser or user.is_staff %}
-            <a class="btn btn-outline-secondary btn-sm float-end" href="/blog/create_post/" role="button"><i class="fas fa-pencil-alt"></i>&nbsp;&nbsp;New Post</a>
+            <a class="btn btn-outline-secondary btn-sm float-end" href="/blog/create_post/" role="button"><i class="fas fa-pencil-alt"></i> New Post</a>
         {% endif %}
     {% endif %}
     {% if category %}

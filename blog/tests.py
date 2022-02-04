@@ -231,3 +231,51 @@ class TestView(TestCase):
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "Post Form 만들기")
         self.assertEqual(last_post.author.username, 'kancho')
+
+
+    # 세 번째 포스트를 수정하는 함수
+    def test_update_post(self):
+        update_post_url = f'/blog/update_post/{self.post_003.pk}/'
+
+        # 로그인 하지 않은 경우 접근 불가능
+        response = self.client.get(update_post_url)
+        self.assertNotEqual(response.status_code, 200)
+
+        # 로그인은 했지만 작성자가 아닌 경우(jamna)도 접근 불가능
+        self.assertNotEqual(self.post_003.author, self.user_jamna)
+        self.client.login(
+            username = self.user_jamna.username,
+            password = 'somepassword'
+        )
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 403)
+
+        # 작성자(kancho)가 접근하는 경우 수정 페이지가 제대로 열리고 HTML 파싱하여 soup에 저장한다.
+        self.client.login(
+            username = self.post_003.author.username,
+            password = 'somepassword'
+        )
+        response = self.client.get(update_post_url)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Edit Post - Blog', soup.title.text)
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Edit Post', main_area.text)
+
+        # 제대로 'Edit Post'가 나오면, title, content, category 값을 다 수정한 다음 Post 방식으로 update_post_url에 날린다.
+        response = self.client.post(
+            update_post_url,
+            {
+                'title': '세 번째 포스트를 수정했습니다. ',
+                'content': '아름다운 시간만 쌓자.',
+                'category': self.category_daily.pk
+            },
+            follow = True
+        )
+        # 3가지가 잘 바뀌었는지 다시 확인해본다.
+        soup = BeautifulSoup(response.content, 'html.parser')
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('세 번째 포스트를 수정했습니다.', main_area.text)
+        self.assertIn('아름다운 시간만 쌓자.', main_area.text)
+        self.assertIn(self.category_daily.name, main_area.text)    

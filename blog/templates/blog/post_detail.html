@@ -14,6 +14,9 @@
             {% else %}
                 <span class="badge rounded-pill bg-secondary float-start">미분류</span>
             {% endif %}
+            {% if user.is_authenticated and user == post.author %}
+                <a class="btn btn-outline-secondary btn-sm float-end" href = "/blog/update_post/{{ post.pk }}/" role="button"><i class="fas fa-pencil-alt"></i> Edit Post</a>
+            {% endif %}
         <!-- Post header-->
             <header class="mb-4">
                 <!-- Post title-->

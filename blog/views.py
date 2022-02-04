@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
+from django.core.exceptions import PermissionDenied
 
 # CBV방식으로 구현
 class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦. 'base.html'을 기본 템플릿으로 사용
@@ -32,11 +33,23 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):          
 
     def form_valid(self, form):                                                             # CreateView에서 제공하는 form_valid()를 재정의하여 확장함.
         current_user = self.request.user
-        if current_user.is_authenticated and (current_user.is_staff or current_user.is_supersuer):
+        if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
             form.instance.author = current_user
             return super(PostCreate, self).form_valid(form)
         else:
             return redirect('/blog/')
+
+class PostUpdate(LoginRequiredMixin, UpdateView):
+    model = Post
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags']
+
+    template_name = 'blog/post_update_form.html'                                            # 원하는 html 파일을 템플릿 파일로 설정함. (기본은 '_form.html')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author:      # 방문자가 로그인한 상태이며 Post 인스턴스의 author 필드와 동일한 경우에만 dispatch() 메서드가 원래 역할을 함.
+            return super(PostUpdate, self).dispatch(request, *args, **kwargs)
+        else:                                                                               # 그렇지 않을 경우 권한이 없음을 나타냄.
+            raise PermissionDenied
 
 # FBV방식으로 category_page() 구현
 def category_page(request, slug):
