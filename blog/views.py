@@ -61,15 +61,46 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):          
 
 class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
-    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category', 'tags']
+    fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
 
     template_name = 'blog/post_update_form.html'                                            # 원하는 html 파일을 템플릿 파일로 설정함. (기본은 '_form.html')
+
+    def get_context_data(self, **kwargs):
+        context = super(PostUpdate, self).get_context_data()
+        if self.object.tags.exists():
+            tags_str_list = list()
+            for t in self.object.tags.all():
+                tags_str_list.append(t.name)
+            context['tags_str_default'] = '; '.join(tags_str_list)                          # 리스트의 값들을 세미콜론으로 결합하여 하나의 문자열로 만든 후 context['tags_str_default']에 담는다.
+
+        return context
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and request.user == self.get_object().author:      # 방문자가 로그인한 상태이며 Post 인스턴스의 author 필드와 동일한 경우에만 dispatch() 메서드가 원래 역할을 함.
             return super(PostUpdate, self).dispatch(request, *args, **kwargs)
         else:                                                                               # 그렇지 않을 경우 권한이 없음을 나타냄.
             raise PermissionDenied
+
+    def form_valid(self, form):                                                             # form_valid()를 재정의하여 확장함.
+        response = super(PostUpdate, self).form_valid(form)                             # 태그 관련 작업 전에 form_valid()의 결괏값을 response라는 변수에 임시로 저장
+        self.object.tags.clear()                                                            # self.object로 가져온 포스트의 태그를 모두 삭제한다.
+
+        tags_str = self.request.POST.get('tags_str')                                    # POST 방식으로 전달된 정보 중 name='tags_str'인 input의 값을 가져와 tags_str에 저장
+        if tags_str:
+            tags_str = tags_str.strip()
+            tags_str = tags_str.replace(',', ';')
+            tags_list = tags_str.split(';')                                             # tags_str로 받은 값을 세미콜론으로 split하여 리스트 형태로 tags_list에 담음.
+
+            for t in tags_list:
+                t = t.strip()
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)                 # get_or_create()는 Tag 모델의 인스턴스와, 그 인스턴스가 새로 생성되었는지 나타내는 bool 형태의 값을 return한다.
+                if is_tag_created:                                                      # 태그가 새로 만들어졌다면, slug가 자동으로 생기지 못했을 것이므로 (한글 태그여도) slugify()로 slug를 만들어 준다.
+                    tag.slug = slugify(t, allow_unicode=True)
+                    tag.save()
+                self.object.tags.add(tag)                                               # 새로 만든 포스트(self.object)의 tags 필드에 태그를 추가한다.
+
+        return response                                                                 # 작업이 다 끝나면 새로 만든 포스트의 페이지로 이동한다.
+    
 
 # FBV방식으로 category_page() 구현
 def category_page(request, slug):

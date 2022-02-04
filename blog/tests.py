@@ -274,19 +274,29 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn('Edit Post', main_area.text)
 
-        # 제대로 'Edit Post'가 나오면, title, content, category 값을 다 수정한 다음 Post 방식으로 update_post_url에 날린다.
+        # 메인 영역에 id_tags_str이라는 id를 가진 input이 있는지 확인하고 input에 self.post_003의 태그가 들어 있는지 확인한다.
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input)
+        self.assertIn('파이썬 공부; python', tag_str_input.attrs['value'])
+
+        # 제대로 'Edit Post'가 나오면, title, content, category, tags_str 값을 수정한 다음 Post 방식으로 update_post_url에 날린다.
         response = self.client.post(
             update_post_url,
             {
-                'title': '세 번째 포스트를 수정했습니다. ',
+                'title': '세 번째 포스트를 수정했습니다.',
                 'content': '아름다운 시간만 쌓자.',
-                'category': self.category_daily.pk
+                'category': self.category_daily.pk,
+                'tags_str': '파이썬 공부; 한글 태그, some tag'
             },
             follow = True
         )
-        # 3가지가 잘 바뀌었는지 다시 확인해본다.
+        # 4가지가 잘 바뀌었는지 다시 확인해본다.
         soup = BeautifulSoup(response.content, 'html.parser')
         main_area = soup.find('div', id='main-area')
         self.assertIn('세 번째 포스트를 수정했습니다.', main_area.text)
         self.assertIn('아름다운 시간만 쌓자.', main_area.text)
-        self.assertIn(self.category_daily.name, main_area.text)    
+        self.assertIn(self.category_daily.name, main_area.text)
+        self.assertIn('파이썬 공부', main_area.text) 
+        self.assertIn('한글 태그', main_area.text)
+        self.assertIn('some tag', main_area.text)
+        self.assertNotIn('python', main_area.text)   
