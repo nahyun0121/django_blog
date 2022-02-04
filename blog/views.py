@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
+from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Post, Category, Tag
 from django.core.exceptions import PermissionDenied
+
 
 # CBV방식으로 구현
 class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦. 'base.html'을 기본 템플릿으로 사용
@@ -31,11 +33,29 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):          
     def test_func(self):                                                                    # 이 페이지에 접근 가능한 사용자는 최고 관리자 또는 스태프로 제한하는 함수
         return self.request.user.is_superuser or self.request.user.is_staff
 
-    def form_valid(self, form):                                                             # CreateView에서 제공하는 form_valid()를 재정의하여 확장함.
+    # 방문자가 폼에 담아 보낸 유효한 정보를 사용해 포스트를 만들고, 이 포스트의 고유 경로로 보내주는(redirect) 함수. CreateView에서 제공한다.
+    def form_valid(self, form):                                                             # form_valid()를 재정의하여 확장함.
         current_user = self.request.user
         if current_user.is_authenticated and (current_user.is_staff or current_user.is_superuser):
             form.instance.author = current_user
-            return super(PostCreate, self).form_valid(form)
+            response = super(PostCreate, self).form_valid(form)                             # 태그 관련 작업 전에 form_valid()의 결괏값을 response라는 변수에 임시로 저장
+
+            tags_str = self.request.POST.get('tags_str')                                    # POST 방식으로 전달된 정보 중 name='tags_str'인 input의 값을 가져와 tags_str에 저장
+            if tags_str:
+                tags_str = tags_str.strip()
+
+                tags_str = tags_str.replace(',', ';')
+                tags_list = tags_str.split(';')                                             # tags_str로 받은 값을 세미콜론으로 split하여 리스트 형태로 tags_list에 담음.
+
+                for t in tags_list:
+                    t = t.strip()
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)                 # get_or_create()는 Tag 모델의 인스턴스와, 그 인스턴스가 새로 생성되었는지 나타내는 bool 형태의 값을 return한다.
+                    if is_tag_created:                                                      # 태그가 새로 만들어졌다면, slug가 자동으로 생기지 못했을 것이므로 (한글 태그여도) slugify()로 slug를 만들어 준다.
+                        tag.slug = slugify(t, allow_unicode=True)
+                        tag.save()
+                    self.object.tags.add(tag)                                               # 새로 만든 포스트(self.object)의 tags 필드에 태그를 추가한다.
+
+            return response                                                                 # 작업이 다 끝나면 새로 만든 포스트의 페이지로 이동한다.
         else:
             return redirect('/blog/')
 

@@ -217,12 +217,17 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn('Create New Post', main_area.text)
 
+        # 포스트 작성 페이지의 main_area에 id='id_tags_str'인 input이 존재하는지 확인한다.
+        tag_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tag_str_input)
+
         # self.client.post()를 이용하여 첫 번째 인수인 해당 경로로 두 번째 인수인 딕셔너리 정보를 POST 방식으로 보낸다.
         self.client.post(
             '/blog/create_post/',
             {
                 'title': 'Post Form 만들기',
                 'content': "Post Form 페이지를 만듭시다.",
+                'tags_str': 'new tag; 한글 태그, python'
             }
         )
         
@@ -231,6 +236,12 @@ class TestView(TestCase):
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "Post Form 만들기")
         self.assertEqual(last_post.author.username, 'kancho')
+
+        # 가장 최신 포스트에 태그가 3개인 것을 확인하고, 새로운 두 태그를 데이터베이스에 등록한 후 태그의 종류가 총 5개가 되었는지 확인한다.
+        self.assertEqual(last_post.tags.count(), 3)
+        self.assertTrue(Tag.objects.get(name='new tag'))
+        self.assertTrue(Tag.objects.get(name='한글 태그'))
+        self.assertEqual(Tag.objects.count(), 5)
 
 
     # 세 번째 포스트를 수정하는 함수
