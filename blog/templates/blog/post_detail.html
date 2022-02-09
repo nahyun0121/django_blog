@@ -36,7 +36,7 @@
             {% endif %}
 
         <!-- Post content-->
-        <p>{{ post.content }}</p>
+        <p>{{ post.get_content_markdown | safe }}</p>       <!-- '| safe': HTML 이스케이핑 -->
 
         {% if post.tags.exists %}
             <i class="fas fa-hashtag"></i>
