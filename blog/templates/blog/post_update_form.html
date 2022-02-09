@@ -1,5 +1,5 @@
 {% extends 'blog/base_full_width.html' %}
-
+{% load crispy_forms_tags %}
 {% block head_title %}Edit Post - Blog{% endblock %}
 
 {% block main_area %}
@@ -7,13 +7,12 @@
   <hr/>
   <form method="post" enctype="multipart/form-data">{% csrf_token %}        <!--<form> 태그는 사용자가 기록한 값을 서버로 보내는 용도. POST 방식으로
    서버에 값을 보내는 방식을 쓴다. enctype=~~는 파일도 같이 전송하겠다는 의미. csrf_token은 CSRF 공격으로부터 웹 사이트를 보호하기 위해 장고가 제공하는 기능.-->
-    <table>
-      {{ form }}
-      <tr>
-        <th><label for="id_tags_str">Tags:</label></th>
-        <td><input type="text" name="tags_str" id="id_tags_str" value="{{ tags_str_default }}"></td>
-      </tr>
-    </table>
+      {{ form | crispy }}
+      <div id="div_id_tags_str">
+        <label for="id_tags_str">Tags:</label>
+        <input type="text" name="tags_str" id="id_tags_str" class="textinput textInput form-control" value="{{ tags_str_default }}">
+      </div>
+      <br/>
     <button type="submit" class="btn btn-outline-secondary float-end">Submit</button>
   </form>
 {% endblock %}
