@@ -1,3 +1,5 @@
+{% load socialaccount %}
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <a class="navbar-brand" href="/">NA NA LAND</a>
@@ -15,21 +17,22 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/about_me/">About me</a>
                 </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Dropdown link
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
-                        <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                </li>
             </ul>
             <ul class="navbar-nav ms-auto"> <!--로그인 버튼 맨 오른쪽 정렬-->
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ user.username }}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="/accounts/logout/">Log out</a>
+                    </div>
+                </li>
+                {% else %}
                 <li class="nav-item">
                     <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Log In</a>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -50,13 +53,13 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="d-grid gap-2">
-                            <button type="button" class="btn btn-outline-dark btn-sm"><i class="fab fa-google"></i>&nbsp&nbsp Log in with Google</button>
-                            <button type="button" class="btn btn-outline-dark btn-sm"><i class="fas fa-envelope"></i>&nbsp&nbsp Log in with E-mail</button>
+                            <a role="button" class="btn btn-outline-dark btn-sm" href="{% provider_login_url 'google' %}"><i class="fab fa-google"></i>&nbsp&nbsp Log in with Google</a>
+                            <a role="button" class="btn btn-outline-dark btn-sm" href="/accounts/login/"><i class="fas fa-envelope"></i>&nbsp&nbsp Log in with Username</a>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="d-grid gap-2">
-                            <buton type="button" class="btn btn-outline-dark btn-sm"><i class="fas fa-envelope"></i>&nbsp&nbsp Sign Up with E-mail</buton>
+                            <a role="button" class="btn btn-outline-dark btn-sm" href="/accounts/signup/"><i class="fas fa-envelope"></i>&nbsp&nbsp Sign Up with E-mail</a>
                         </div>
                     </div>
                 </div>

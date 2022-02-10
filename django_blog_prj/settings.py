@@ -42,6 +42,11 @@ INSTALLED_APPS = [
 
     'crispy_forms',
     'markdownx',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     
     'blog',
     'single_pages'
@@ -133,3 +138,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, '_media')
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+
+AUTHENTICATION_BACKENDS = (
+
+    'django.contrib.auth.backends.ModelBackend',
+
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+)
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_REQUIRED = True           # 회원가입 시 이메일을 반드시 받음
+ACCOUNT_EMAIL_VERIFICATION = 'none'     # 그 이메일이 맞는지 검증은 X
+LOGIN_REDIRECT_URL = '/blog/'           # 로그인 성공 시 포스트 목록 페이지로 리다이렉트
