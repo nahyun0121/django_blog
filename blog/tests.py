@@ -2,7 +2,7 @@ from telnetlib import LOGOUT
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 
 # class TestView(TestCase):
 #     def test_post_list(self):   # 'Test'로 시작하는 이름을 가진 클래스 안에 'test'로 시작하는 이름으로 함수를 정의함. => 테스트 코드를 작성할 때의 규칙!
@@ -45,6 +45,13 @@ class TestView(TestCase):
         )
         self.post_003.tags.add(self.tag_python_kor)
         self.post_003.tags.add(self.tag_python)
+
+        # 잠나가 첫 번째 게시물에 댓글을 남긴다.
+        self.comment_001 = Comment.objects.create(
+            post=self.post_001,
+            author=self.user_jamna,
+            content='NCT DREAM - Hello Future'
+        )
 
 
     def category_card_test(self, soup):
@@ -153,6 +160,11 @@ class TestView(TestCase):
         self.assertIn(self.tag_hello.name, post_area.text)
         self.assertNotIn(self.tag_python.name, post_area.text)
         self.assertNotIn(self.tag_python_kor.name, post_area.text)
+        # 2.8 첫 번째 포스트의 댓글 작성자(jamna)와 댓글 내용이 포스트 영역에 있다.
+        comments_area = soup.find('div', id='comment-area')
+        comment_001_area = comments_area.find('div', id='comment-1')
+        self.assertIn(self.comment_001.author.username, comment_001_area.text)
+        self.assertIn(self.comment_001.content, comment_001_area.text)
 
 
     def test_category_page(self):

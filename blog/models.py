@@ -65,3 +65,18 @@ class Post(models.Model):
 
     def get_content_markdown(self):                                                   # Post 레코드의 content 필드에 저장돼 있는 텍스트를 마크다운 문법을 적용해 HTML로 변환함
         return markdown(self.content)
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+
+    def __str__(self):
+        return f'{self.author}::{self.content}'
+
+    def get_absolute_url(self):
+        return f'{self.post.get_absolute_url()}#comment-{self.pk}'                  # '#'은 HTML 요소의 id를 의미함.
