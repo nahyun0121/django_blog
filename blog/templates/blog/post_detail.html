@@ -1,5 +1,5 @@
 {% extends 'blog/base.html' %}
-
+{% load crispy_forms_tags %}
 {% block head_title %}
     {{ post.title }} - Blog
 {% endblock %}
@@ -69,12 +69,25 @@
 
     <div id="comment-area">
         <!-- Comments section-->
-        <section class="mb-5">
-            <div class="card bg-light">
+        <div class="card my-4">
+            <h5 class="card-header">Let's leave a comment! (｡•̀ᴗ-)✧</h5>
                 <div class="card-body">
                     <!-- Comment form-->
-                    <form class="mb-4"><textarea class="form-control" rows="3" placeholder="Join the discussion and leave a comment!"></textarea></form>
-
+                    {% if user.is_authenticated %}
+                    <form id="comment-form" method="POST" action="{{ post.get_absolute_url }}new_comment/">
+                        {% csrf_token %}
+                        <div class="form-group mb-2">
+                            {{ comment_form | crispy }}
+<!--                            <textarea class="form-control mb-2" rows="3" placeholder="Let's leave a comment! (｡•̀ᴗ-)✧"></textarea>-->
+                        </div>
+                        <button type="submit" class="btn btn-outline-secondary float-end">Submit</button>
+                    </form>
+                    {% else %}
+                    <div class="d-grid gap-2 col-6 mx-auto">
+                        <button class="btn btn-secondary" type="button" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Join NANALAND and leave a comment!</button>
+                    </div>
+                    {% endif %}
+                    </br>
                     {% if post.comment_set.exists %}
                         {% for comment in post.comment_set.iterator %}
                         <!-- Single comment-->
@@ -113,7 +126,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </h5>
+        </div>
     </div>
 {% endblock %}

@@ -2,7 +2,9 @@ from django.shortcuts import render, redirect
 from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import get_object_or_404
 from .models import Post, Category, Tag
+from .forms import CommentForm
 from django.core.exceptions import PermissionDenied
 
 
@@ -24,6 +26,7 @@ class PostDetail(DetailView):       # FBV 스타일의 single_post_page 함수�
         context = super(PostDetail, self).get_context_data()
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        context['comment_form'] = CommentForm
         return context
 
 class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):                      # LoginRequiredMixin 클래스는 장고에서 제공하며, 로그인했을 때만 정상적으로 페이지를 보여줌.
@@ -137,6 +140,28 @@ def tag_page(request, slug):
             'no_category_post_count': Post.objects.filter(category=None).count(),
         }
     )
+
+
+# FBV방식으로 new_comment() 구현
+def new_comment(request, pk):
+    if request.user.is_authenticated:                   
+        post = get_object_or_404(Post, pk=pk)               # 해당 pk가 없는 경우 404 오류를 발생시킨다.
+
+
+        if request.method == 'POST':                        # 폼을 작성한 후 <submit> 버튼을 눌러 POST 방식으로 서버에 요청되면,
+            comment_form = CommentForm(request.POST)        # 정상적으로 폼을 작성하고 POST 방식으로 서버에 요청이 들어왔다면 그 정보를 CommentForm 형태로 가져온다.
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)   # 해당 내용으로 새로운 레코드를 만들기 전, 저장은 일단 미룸
+                comment.post = post                         # post 필드는 pk로 가져온 포스트로 채우고,
+                comment.author = request.user               # author 필드는 로그인한 사용자 정보로 채운다.
+                comment.save()                              # 이 작업이 모두 끝나면 저장한다.
+                return redirect(comment.get_absolute_url())
+        else:                                               # GET 방식으로 서버에 요청하게 되면, pk=숫자인 포스트 페이지로 리다이렉트 됨.
+            return redirect(post.get_absolute_url())
+    else:                                                   # 로그인하지 않은 경우 PermissionDenied 발생시킨다.
+        raise PermissionDenied
+
+
 
 
 # FBV방식으로 구현
