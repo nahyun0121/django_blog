@@ -324,7 +324,7 @@ class TestView(TestCase):
         soup = BeautifulSoup(response.content, 'html.parser')
 
         comment_area = soup.find('div', id='comment-area')
-        self.assertIn('Join NANALAND and leave a comment!', comment_area.text)
+        self.assertIn("Join NANALAND and leave a comment!", comment_area.text)
         self.assertFalse(comment_area.find('form', id='comment-form'))     # 로그인하지 않은 상태이므로 id가 comment-form인 form요소 존재 X
 
         # 로그인한 상태
@@ -334,7 +334,7 @@ class TestView(TestCase):
         soup = BeautifulSoup(response.content, 'html.parser')
 
         comment_area = soup.find('div', id='comment-area')
-        self.assertNotIn('Join NANALAND and leave a comment!', comment_area.text)
+        self.assertNotIn("Join NANALAND and leave a comment!", comment_area.text)
 
         comment_form = comment_area.find('form', id='comment-form')
         self.assertTrue(comment_form.find('textarea', id='id_content'))    # 로그인한 상태이므로 댓글 폼이 보이고, 그 안에 textarea도 있다.
@@ -362,6 +362,56 @@ class TestView(TestCase):
         self.assertIn('칸쵸의 댓글입니다.', new_comment_div.text)
 
 
+    def test_comment_update(self):
+        comment_by_jamna = Comment.objects.create(
+            post = self.post_001,
+            author=self.user_jamna,
+            content='잠나의 댓글입니다.'
+        )
 
+        # 로그인하지 않은 상태에서 댓글이 2개 있는 첫 번째 포스트 페이지를 연다.
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
 
+        # 댓글 영역의 각 댓글(2개)의 수정 버튼이 보이지 않는다.
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-update-btn'))
+        self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
 
+        # kancho로 로그인한 상태
+        self.client.login(username='kancho', password='somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # jamna가 작성한 댓글에 대한 수정 버튼은 보이지 않고, kancho가 작성한 댓글에 대한 수정 버튼만 보임. 그리고 그 버튼에 링크 경로를 담은 href 속성이 있는데, 그 경로는 'blog/~'이다.
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
+        comment_001_update_btn = comment_area.find('a', id='comment-1-update-btn')
+        self.assertIn('edit', comment_001_update_btn.text)
+        self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
+
+        # edit 버튼을 통해 댓글을 수정한다.
+        response = self.client.get('/blog/update_comment/1/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Edit Comment - Blog', soup.title.text)
+        update_comment_form = soup.find('form', id='comment-form')
+        content_textarea = update_comment_form.find('textarea', id='id_content')
+        self.assertIn(self.comment_001.content, content_textarea.text)
+
+        response = self.client.post(
+            f'/blog/update_comment/{self.comment_001.pk}/',
+            {
+                'content' : "칸쵸의 댓글을 수정합니다.", 
+            },
+            follow=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        comment_001_div = soup.find('div', id='comment-1')
+        self.assertIn('칸쵸의 댓글을 수정합니다.', comment_001_div.text)
+        self.assertIn('Updated: ', comment_001_div.text)

@@ -3,7 +3,7 @@ from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 from django.core.exceptions import PermissionDenied
 
@@ -104,6 +104,16 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
         return response                                                                 # 작업이 다 끝나면 새로 만든 포스트의 페이지로 이동한다.
     
+
+class CommentUpdate(LoginRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+
+    def dispatch(self, request, *args, **kwargs):                                       # 웹 사이트 방문자의 요청이 GET인지 POST인지 판단하는 함수
+        if request.user.is_authenticated and request.user == self.get_object().author:  # 판단하기 전 다른 사용자의 댓글 해킹 방지
+            return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
 
 # FBV방식으로 category_page() 구현
 def category_page(request, slug):
