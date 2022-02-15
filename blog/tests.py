@@ -13,10 +13,12 @@ class TestView(TestCase):
         self.client = Client()
         self.user_kancho = User.objects.create_user(username='kancho', password='somepassword')         # 사용자 생성(이름, 패스워드까지 설정)
         self.user_jamna = User.objects.create_user(username='jamna', password='somepassword')
-        self.user_kancho.is_staff = True                                                                # 사용자 '칸쵸'는 스태프!
-        self.user_kancho.save()
+        self.user_jamna.is_staff = True                                                                # 사용자 '칸쵸'는 스태프!
+        self.user_jamna.save()
+
         self.category_programming = Category.objects.create(name='programming', slug='programming')
         self.category_daily = Category.objects.create(name='daily', slug='daily')
+        
         self.tag_python_kor = Tag.objects.create(name='파이썬 공부', slug='파이썬-공부')
         self.tag_python = Tag.objects.create(name='python', slug='python')
         self.tag_hello = Tag.objects.create(name='hello', slug='hello')
@@ -41,7 +43,7 @@ class TestView(TestCase):
         self.post_003 = Post.objects.create(
             title = '세 번째 포스트입니다.',
             content = '너를 만나 같이 더 빛나.',
-            author = self.user_kancho
+            author = self.user_jamna
         )
         self.post_003.tags.add(self.tag_python_kor)
         self.post_003.tags.add(self.tag_python)
@@ -212,13 +214,13 @@ class TestView(TestCase):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
-        # staff가 아닌 jamna가 로그인을 하여 포스트 생성을 하지 못 한다.
-        self.client.login(username='jamna', password='somepassword')
+        # staff가 아닌 kancho가 로그인을 하여 포스트 생성을 하지 못 한다.
+        self.client.login(username='kancho', password='somepassword')
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
-        # staff인 kancho로 로그인을 한다.
-        self.client.login(username='kancho', password='somepassword')
+        # staff인 jamna로 로그인을 한다.
+        self.client.login(username='jamna', password='somepassword')
 
         # /blog/create_post/라는 URL로 방문자가 접근하면 포스트 작성 페이지가 정상적으로 열리는지 확인 후 HTML 파싱한다.
         response = self.client.get('/blog/create_post/')
@@ -247,7 +249,7 @@ class TestView(TestCase):
         self.assertEqual(Post.objects.count(), 4)
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, "Post Form 만들기")
-        self.assertEqual(last_post.author.username, 'kancho')
+        self.assertEqual(last_post.author.username, 'jamna')
 
         # 가장 최신 포스트에 태그가 3개인 것을 확인하고, 새로운 두 태그를 데이터베이스에 등록한 후 태그의 종류가 총 5개가 되었는지 확인한다.
         self.assertEqual(last_post.tags.count(), 3)
@@ -264,16 +266,16 @@ class TestView(TestCase):
         response = self.client.get(update_post_url)
         self.assertNotEqual(response.status_code, 200)
 
-        # 로그인은 했지만 작성자가 아닌 경우(jamna)도 접근 불가능
-        self.assertNotEqual(self.post_003.author, self.user_jamna)
+        # 로그인은 했지만 작성자가 아닌 경우(kancho)도 접근 불가능
+        self.assertNotEqual(self.post_003.author, self.user_kancho)
         self.client.login(
-            username = self.user_jamna.username,
+            username = self.user_kancho.username,
             password = 'somepassword'
         )
         response = self.client.get(update_post_url)
         self.assertEqual(response.status_code, 403)
 
-        # 작성자(kancho)가 접근하는 경우 수정 페이지가 제대로 열리고 HTML 파싱하여 soup에 저장한다.
+        # 작성자(jamna)가 접근하는 경우 수정 페이지가 제대로 열리고 HTML 파싱하여 soup에 저장한다.
         self.client.login(
             username = self.post_003.author.username,
             password = 'somepassword'
@@ -328,7 +330,7 @@ class TestView(TestCase):
         self.assertFalse(comment_area.find('form', id='comment-form'))     # 로그인하지 않은 상태이므로 id가 comment-form인 form요소 존재 X
 
         # 로그인한 상태
-        self.client.login(username='kancho', password='somepassword')
+        self.client.login(username='jamna', password='somepassword')
         response = self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -341,7 +343,7 @@ class TestView(TestCase):
         response = self.client.post(
             self.post_001.get_absolute_url() + 'new_comment/',
             {
-                'content': "칸쵸의 댓글입니다.",
+                'content': "잠나의 댓글입니다.",
             },
             follow=True                                                    # POST로 보내는 경우 서버에서 처리한 후 리다이렉트되는데, 이때 따라가도록 하는 역할
         )
@@ -358,15 +360,15 @@ class TestView(TestCase):
 
         comment_area = soup.find('div', id='comment-area')
         new_comment_div = comment_area.find('div', id=f'comment-{new_comment.pk}')
-        self.assertIn('kancho', new_comment_div.text)
-        self.assertIn('칸쵸의 댓글입니다.', new_comment_div.text)
+        self.assertIn('jamna', new_comment_div.text)
+        self.assertIn('잠나의 댓글입니다.', new_comment_div.text)
 
 
     def test_comment_update(self):
-        comment_by_jamna = Comment.objects.create(
+        comment_by_kancho = Comment.objects.create(
             post = self.post_001,
-            author=self.user_jamna,
-            content='잠나의 댓글입니다.'
+            author=self.user_kancho,
+            content='칸쵸의 댓글입니다.'
         )
 
         # 로그인하지 않은 상태에서 댓글이 2개 있는 첫 번째 포스트 페이지를 연다.
@@ -379,8 +381,8 @@ class TestView(TestCase):
         self.assertFalse(comment_area.find('a', id='comment-1-update-btn'))
         self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
 
-        # kancho로 로그인한 상태
-        self.client.login(username='kancho', password='somepassword')
+        # jamna로 로그인한 상태
+        self.client.login(username='jamna', password='somepassword')
         response = self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -405,7 +407,7 @@ class TestView(TestCase):
         response = self.client.post(
             f'/blog/update_comment/{self.comment_001.pk}/',
             {
-                'content' : "칸쵸의 댓글을 수정합니다.", 
+                'content' : "잠나의 댓글을 수정합니다.", 
             },
             follow=True
         )
@@ -413,5 +415,64 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
         comment_001_div = soup.find('div', id='comment-1')
-        self.assertIn('칸쵸의 댓글을 수정합니다.', comment_001_div.text)
+        self.assertIn('잠나의 댓글을 수정합니다.', comment_001_div.text)
         self.assertIn('Updated: ', comment_001_div.text)
+
+
+    def test_delete_comment(self):
+        comment_by_kancho = Comment.objects.create(
+            post=self.post_001,
+            author=self.user_kancho,
+            content='칸쵸의 댓글입니다.'
+        )
+
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(self.post_001.comment_set.count(), 2)
+
+        # 로그인하지 않은 상태
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn'))
+        self.assertFalse(comment_area.find('a', id='comment-2-delete-btn'))
+
+        # kancho로 로그인한 상태
+        self.client.login(username='kancho', password='somepassword')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        # kancho 본인이 작성한 댓글의 delete 버튼(정말로 지울 것인지 한 번 더 물어보는 모달을 나타내기 위한 버튼)만 보인다.
+        comment_area = soup.find('div', id='comment-area')
+        self.assertFalse(comment_area.find('a', id='comment-1-delete-btn'))
+        comment_002_delete_moda_btn = comment_area.find(
+            'a', id='comment-2-delete-modal-btn'
+        )
+        self.assertIn('delete', comment_002_delete_moda_btn.text)
+        self.assertEqual(
+            comment_002_delete_moda_btn.attrs['data-target'],
+            '#deleteCommentModal-2'
+        )
+        # 삭제할 지 물어보는 모달에는 'Are Your Sure?'라는 문구와 함께 delete 버튼이 있으며 이 버튼은 '/blog/delete_~~'로 연결된다.
+        delete_comment_modal_002 = soup.find('div', id='deleteCommentModal-2')
+        self.assertIn('Are You Sure?', delete_comment_modal_002.text)
+        really_delete_btn_002 = delete_comment_modal_002.find('a')
+        self.assertIn('Delete', really_delete_btn_002.text)
+        self.assertEqual(
+            really_delete_btn_002.attrs['href'],
+            '/blog/delete_comment/2/'
+        )
+
+        # delete 버튼을 클릭하면 칸쵸의 댓글이 삭제되고 첫 번째 포스트 파에지로 리다이렉트 된다.
+        response = self.client.get('/blog/delete_comment/2/', follow=True)
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(self.post_001.title, soup.title.text)
+        comment_area = soup.find('div', id='comment-area')
+        self.assertNotIn('칸쵸의 댓글입니다.', comment_area.text)
+
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(self.post_001.comment_set.count(), 1)
+
