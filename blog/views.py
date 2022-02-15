@@ -12,6 +12,7 @@ from django.core.exceptions import PermissionDenied
 class PostList(ListView):           # FBV 스타일의 index() 함수를 대체하는 PostList 클래스를 ListView 클래스를 상속하여 만듦. 'base.html'을 기본 템플릿으로 사용
     model = Post
     ordering = '-pk'
+    paginate_by = 5
 
     def get_context_data(self, **kwargs):                                                   # get_context_data 정의하여 오버라이딩
         context = super(PostList, self).get_context_data()
