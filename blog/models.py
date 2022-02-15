@@ -80,3 +80,9 @@ class Comment(models.Model):
 
     def get_absolute_url(self):
         return f'{self.post.get_absolute_url()}#comment-{self.pk}'                  # '#'은 HTML 요소의 id를 의미함.
+
+    def get_avatar_url(self):                                                       # django-allauth를 이용해 소셜 로그인을 한 경우 그 소셜 로그인 계정의 아바타 URL을, 그렇지 않은 경우에는 원래 있던 회색 이미지 사용.
+        if self.author.socialaccount_set.exists():
+            return self.author.socialaccount_set.first().get_avatar_url()
+        else:
+            return f'https://doitdjango.com/avatar/id/572/f54edd72f9ec1cab/svg/{self.author.email}'
