@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from .models import Post, Category, Tag, Comment
 from .forms import CommentForm
 from django.core.exceptions import PermissionDenied
@@ -115,6 +116,24 @@ class CommentUpdate(LoginRequiredMixin, UpdateView):
             return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
         else:
             raise PermissionDenied
+
+
+class PostSearch(PostList):
+    paginate_by = None                                                              # 검색된 결과를 한 페이지에 다 보여주기 위해 paginated_by를 다시 None으로 설정
+
+    def get_queryset(self):                                                         # ListView에서 기본적으로 제공함. model로 지정된 요소 전체를 가져 오는데, 검색된 결과만 가져와야 하므로 오버라이딩.
+        q = self.kwargs['q']                                                        # URL을 통해 넘어온 검색어를 받아 변수 q에 저장함
+        post_list = Post.objects.filter(                                            
+            Q(title__contains=q) | Q(tags__name__contains=q)                        # 여러 쿼리를 동시에 써야 할 때 장고에서 제공하는 Q 이용. '__': '.'과 같은 의미. 쿼리 조건 규칙
+        ).distinct()                                                                # 중복으로 가져온 요소가 있을 때(제목과 태그에 모두 검색어가 있는 경우) 한 번만 나타나게 함
+        return post_list
+    
+    def get_context_data(self, **kwargs):                                           # PostList에도 이 메소드가 있지만, 다른 인자를 추가하기 위해 오버라이딩
+        context = super(PostSearch, self).get_context_data()
+        q = self.kwargs['q']
+        context['search_info'] = f'Search: {q} ({self.get_queryset().count()})'
+
+        return context
 
 # FBV방식으로 category_page() 구현
 def category_page(request, slug):

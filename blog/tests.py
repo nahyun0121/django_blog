@@ -447,12 +447,12 @@ class TestView(TestCase):
         # kancho 본인이 작성한 댓글의 delete 버튼(정말로 지울 것인지 한 번 더 물어보는 모달을 나타내기 위한 버튼)만 보인다.
         comment_area = soup.find('div', id='comment-area')
         self.assertFalse(comment_area.find('a', id='comment-1-delete-btn'))
-        comment_002_delete_moda_btn = comment_area.find(
+        comment_002_delete_modal_btn = comment_area.find(
             'a', id='comment-2-delete-modal-btn'
         )
-        self.assertIn('delete', comment_002_delete_moda_btn.text)
+        self.assertIn('delete', comment_002_delete_modal_btn.text)
         self.assertEqual(
-            comment_002_delete_moda_btn.attrs['data-target'],
+            comment_002_delete_modal_btn.attrs['data-bs-target'],
             '#deleteCommentModal-2'
         )
         # 삭제할 지 물어보는 모달에는 'Are Your Sure?'라는 문구와 함께 delete 버튼이 있으며 이 버튼은 '/blog/delete_~~'로 연결된다.
@@ -476,3 +476,22 @@ class TestView(TestCase):
         self.assertEqual(Comment.objects.count(), 1)
         self.assertEqual(self.post_001.comment_set.count(), 1)
 
+
+    def test_search(self):
+        post_about_python = Post.objects.create(
+            title='파이썬에 대한 포스트입니다.',
+            content='Hello World. We are the world.',
+            author=self.user_kancho
+        )
+
+        response = self.client.get('/blog/search/파이썬/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        main_area = soup.find('div', id='main-area')
+
+        self.assertIn('Search: 파이썬 (2)', main_area.text)
+        self.assertNotIn(self.post_001.title, main_area.text)
+        self.assertNotIn(self.post_002.title, main_area.text)
+        self.assertIn(self.post_003.title, main_area.text)
+        self.assertIn(post_about_python.title, main_area.text)

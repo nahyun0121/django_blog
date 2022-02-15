@@ -12,6 +12,7 @@
         <h2 style="display:inline" class="lh-lg"><span class="badge rounded-pill bg-secondary">{{ category }}</span></h2>
     {% else %}
         <h1>Blog
+            {% if search_info %}<small class="text-muted">{{ search_info }}</small>{% endif %}
         {% if tag %}
             <button type="button" class="btn btn-light position-relative"><i class="fas fa-hashtag"></i> {{ tag }}
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{tag.post_set.count }}
