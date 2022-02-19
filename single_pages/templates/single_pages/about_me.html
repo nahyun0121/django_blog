@@ -1,19 +1,172 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>개발자 김나나</title>
+    <title>About NA NA</title>
+
+    <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
+    <link rel="stylesheet" href="{% static 'single_pages/css/about_me.css' %}" media="screen">
+    <script src="https://kit.fontawesome.com/c609b81c0f.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<nav>
-  <a href="/bog/">Blog</a>
-  <a href="/about_me">About me</a>
-</nav>
 
+{% include 'blog/navbar.html' %}
 
-<h1>안녕하세요. 김나현입니다</h1>
-<h2>이력</h2>
-<h2>Portfolio</h2>
-<h3>아직 공사중입니다.</h3>
+<section>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1>안녕하세요. 김나현입니다 :)</h1>
+                <br/>
+                <p class="lead">
+                    음악과 컴퓨터와 맛집탐방을 좋아합니다.<br/>
+                    나이는 스물 둘이고, 프런트엔드에 관심이 생긴 컴퓨터공학과 휴학생입니다!
+                </p>
+
+                <ul>
+                    <li>WORK EXPERIENCE</li>
+                    <ul>
+                        <li>프런트엔드&백엔드 개발 (2027.03 ~)</li>
+                        <li>빅데이터분석 (2025.10 ~ 2026. 09)</li>
+                    </ul>
+                    <li>EDUCATION</li>
+                    <ul>
+                        <li>공학박사, 장고공학(Django Engineering), 경희대학교(2022.03 ~ 2025.02)</li>
+                        <li>엔시티석사, 에스엠(SM Ent.), 2018.12 ~ </li>
+                        <li>AWS associate certification, 2022.09 ~ 2024.08</li>
+                    </ul>
+                    <li>Hobby</li>
+                    <ul>
+                        <li>Yoga</li>
+                        <li>Computer</li>
+                        <li>Eating</li>
+                    </ul>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <img class="img-fluid" src="{% static 'single_pages/images/me.jpg' %}">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light margin-for-footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <h1>PORTFOLIO</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#project_1">
+                    <img class="card-img-top" src="{% static 'single_pages/images/project_1.png' %}">
+                    <div class="card-body">
+                        <h5 class="card-title">세상에 없던 전동 킥보드 앱 '쿼카'</h5>
+                        <p>기존 전동 킥보드의 요금 방식을 새롭게 정의하고, 환경을 생각하여 충전 스테이션에 두면 보상을 주는 제도를 도입했습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#project_2">
+                    <img class="card-img-top" src="{% static 'single_pages/images/project_2.jpg' %}">
+                    <div class="card-body">
+                        <h5 class="card-title">MZ세대, 놀면뭐하비?</h5>
+                        <p>MZ세대 사이에 핫한 테스트인 MBTI 테스트를 저희만의 방식으로 귀여운 캐릭터들과 함께 재정의해보았습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card" data-bs-toggle="modal" data-bs-target="#project_3">
+                    <img class="card-img-top" src="{% static 'single_pages/images/project_3.jpg' %}">
+                    <div class="card-body">
+                        <h5 class="card-title">닮은꼴 뷰티 유튜버를 찾아라!</h5>
+                        <p>opencv를 이용하여 뷰티 유튜버들의 얼굴과 나의 얼굴을 합성해보고 가장 유사한 뷰티 유튜버를 찾아줍니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal -->
+<div class="modal fade" id="project_1" tabindex="-1" role="dialog" aria-labelledby="project_1ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="project_1ModalLabel">세상에 없던 전동 킥보드 앱 '쿼카'</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/project_1.png' %}">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>기존 전동 킥보드의 요금 방식을 새롭게 정의하고, 환경을 생각하여 충전 스테이션에 두면 보상을 주는 제도를 도입했습니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="project_2" tabindex="-1" role="dialog" aria-labelledby="project_2ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="project_2ModalLabel">MZ세대, 놀면뭐하비?</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/project_2.jpg' %}">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>MZ세대 사이에 핫한 테스트인 MBTI 테스트를 저희만의 방식으로 귀여운 캐릭터들과 함께 재정의해보았습니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="project_3" tabindex="-1" role="dialog" aria-labelledby="project_3ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="project_3ModalLabel">닮은꼴 뷰티 유튜버를 찾아라!</h5>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <img class="img-fluid" src="{% static 'single_pages/images/project_3.jpg' %}">
+                    </div>
+                    <div class="col-lg-5">
+                        <p>opencv를 이용하여 뷰티 유튜버들의 얼굴과 나의 얼굴을 합성해보고 가장 유사한 뷰티 유튜버를 찾아줍니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fixed-bottom">
+    {% include 'blog/footer.html' %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
 </body>
 </html>
