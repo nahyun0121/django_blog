@@ -66,6 +66,12 @@ class Post(models.Model):
     def get_content_markdown(self):                                                   # Post 레코드의 content 필드에 저장돼 있는 텍스트를 마크다운 문법을 적용해 HTML로 변환함
         return markdown(self.content)
 
+    def get_avatar_url(self):
+        if self.author.socialaccount_set.exists():
+            return self.author.socialaccount_set.first().get_avatar_url()
+        else:
+            return f'https://doitdjango.com/avatar/id/572/f54edd72f9ec1cab/svg/{self.author.email}'
+
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

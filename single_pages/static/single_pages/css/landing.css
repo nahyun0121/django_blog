@@ -1,0 +1,16 @@
+body {
+    background: url('/static/single_pages/images/flower.jpg') no-repeat center center fixed;
+    /* -web 등 세 개의 접두어는 다양한 브라우저에서 동일하게 작동하기 위함이고, cover는 그림이 최대한 크게 나오도록(비율 고정) 할 때 씀. */
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+section {
+    margin-bottom: 150px;       /* 푸터에 의해 section 안의 내용이 가려지지 않도록 */
+}
+/* '.card': class="card"로 지정된 요소. rgba: red, green, blue, alpha(투명도) */
+.card {
+    background-color: rgba(255, 255, 255, 0.6);
+}
